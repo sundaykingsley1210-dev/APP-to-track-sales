@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#764ba2">
+    <meta name="description" content="Track your sales with ease - Download now!">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Sales Tracker">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
     <title>Sales Tracker</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -36,6 +44,7 @@
 
         <!-- Controls -->
         <section class="controls">
+            <button id="installBtn" class="btn btn-install" style="display:none;">📲 Install App</button>
             <button id="addSaleBtn" class="btn btn-primary">+ Add Sale</button>
             <input type="text" id="searchInput" placeholder="Search by customer or product...">
             <select id="statusFilter">

@@ -1,0 +1,24 @@
+{
+  "name": "app-to-track-sales",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sundaykingsley1210-dev/APP-to-track-sales.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sundaykingsley1210-dev/APP-to-track-sales/issues"
+  },
+  "homepage": "https://github.com/sundaykingsley1210-dev/APP-to-track-sales#readme",
+  "dependencies": {
+    "canvas": "^3.2.3"
+  }
+}

@@ -1,6 +1,35 @@
+let deferredPrompt;
 let sales = JSON.parse(localStorage.getItem('sales')) || [];
 
 const modal = document.getElementById('modal');
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+});
+
+installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+        installBtn.style.display = 'none';
+    }
+    deferredPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+    deferredPrompt = null;
+});
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('Service Worker registered'))
+        .catch(err => console.log('SW registration failed:', err));
+}
 const addSaleBtn = document.getElementById('addSaleBtn');
 const closeBtn = document.querySelector('.close');
 const saleForm = document.getElementById('saleForm');

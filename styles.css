@@ -133,6 +133,23 @@ header h1 {
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
+.btn-install {
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    color: white;
+    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+    animation: pulse 2s infinite;
+}
+
+.btn-install:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4); }
+    50% { box-shadow: 0 4px 25px rgba(17, 153, 142, 0.7); }
+}
+
 .btn-danger {
     background: linear-gradient(135deg, #f5576c, #ff6b6b);
     color: white;
