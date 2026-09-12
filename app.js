@@ -3,25 +3,37 @@ let sales = JSON.parse(localStorage.getItem('sales')) || [];
 
 const modal = document.getElementById('modal');
 const installBtn = document.getElementById('installBtn');
+const heroInstallBtn = document.getElementById('heroInstallBtn');
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     installBtn.style.display = 'inline-block';
+    heroInstallBtn.classList.add('available');
 });
 
-installBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
+async function handleInstall() {
+    if (!deferredPrompt) {
+        window.open('https://app-to-track-sales.vercel.app', '_blank');
+        return;
+    }
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === 'accepted') {
         installBtn.style.display = 'none';
+        heroInstallBtn.textContent = '✅ Installed!';
+        heroInstallBtn.classList.add('installed');
     }
     deferredPrompt = null;
-});
+}
+
+installBtn.addEventListener('click', handleInstall);
+heroInstallBtn.addEventListener('click', handleInstall);
 
 window.addEventListener('appinstalled', () => {
     installBtn.style.display = 'none';
+    heroInstallBtn.textContent = '✅ Installed!';
+    heroInstallBtn.classList.add('installed');
     deferredPrompt = null;
 });
 
