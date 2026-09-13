@@ -15,76 +15,144 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Sales Tracker</h1>
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="login-overlay show">
+        <div class="login-box">
+            <h2>Sales Tracker</h2>
+            <p class="subtitle">Sign in to continue</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+                <p id="loginError" class="login-error">Invalid email or password</p>
+            </form>
+            <p class="login-footer">Admin: admin@gmail.com / admin123</p>
         </div>
-    </header>
+    </div>
 
-    <main class="container">
-        <!-- Hero / Install Banner -->
-        <section class="hero">
-            <div class="hero-content">
-                <h2>Track Your Sales Easily</h2>
-                <p>Install this app on your phone or computer for quick access anytime, even offline.</p>
-                <button id="heroInstallBtn" class="btn btn-hero-install">📲 Download / Install App</button>
-                <p class="hero-hint">On phone: Tap "Add to Home Screen" &bull; On PC: Click "Install"</p>
+    <!-- App (hidden until login) -->
+    <div id="appContent" style="display:none;">
+        <header>
+            <div class="container header-right">
+                <h1>Sales Tracker</h1>
+                <div class="user-badge">
+                    <span id="loggedUser"></span>
+                    <button id="logoutBtn" class="btn-logout">Logout</button>
+                </div>
             </div>
-        </section>
+        </header>
 
-        <!-- Dashboard -->
-        <section class="dashboard">
-            <div class="card">
-                <h3>Total Sales</h3>
-                <p id="totalSales">₦0.00</p>
-            </div>
-            <div class="card">
-                <h3>Total Count</h3>
-                <p id="totalCount">0</p>
-            </div>
-            <div class="card">
-                <h3>Average Sale</h3>
-                <p id="avgSale">₦0.00</p>
-            </div>
-            <div class="card">
-                <h3>Pending</h3>
-                <p id="pendingCount">0</p>
-            </div>
-        </section>
+        <main class="container">
+            <!-- Hero / Install Banner -->
+            <section class="hero">
+                <div class="hero-content">
+                    <h2>Track Your Sales Easily</h2>
+                    <p>Install this app on your phone or computer for quick access anytime, even offline.</p>
+                    <button id="heroInstallBtn" class="btn btn-hero-install">📲 Download / Install App</button>
+                    <p class="hero-hint">On phone: Tap "Add to Home Screen" &bull; On PC: Click "Install"</p>
+                </div>
+            </section>
 
-        <!-- Controls -->
-        <section class="controls">
-            <button id="installBtn" class="btn btn-install" style="display:none;">📲 Install App</button>
-            <button id="addSaleBtn" class="btn btn-primary">+ Add Sale</button>
-            <input type="text" id="searchInput" placeholder="Search by customer or product...">
-            <select id="statusFilter">
-                <option value="all">All Status</option>
-                <option value="Completed">Completed</option>
-                <option value="Pending">Pending</option>
-                <option value="Cancelled">Cancelled</option>
-            </select>
-        </section>
+            <!-- Dashboard -->
+            <section class="dashboard">
+                <div class="card">
+                    <h3>Total Sales</h3>
+                    <p id="totalSales">₦0.00</p>
+                </div>
+                <div class="card">
+                    <h3>Total Count</h3>
+                    <p id="totalCount">0</p>
+                </div>
+                <div class="card">
+                    <h3>Average Sale</h3>
+                    <p id="avgSale">₦0.00</p>
+                </div>
+                <div class="card">
+                    <h3>Pending</h3>
+                    <p id="pendingCount">0</p>
+                </div>
+            </section>
 
-        <!-- Sales Table -->
-        <section class="table-container">
-            <table id="salesTable">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Customer</th>
-                        <th>Product/Service</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="salesBody">
-                    <!-- Sales rows will be inserted here -->
-                </tbody>
-            </table>
-            <p id="noSales" class="no-data">No sales recorded yet. Click "Add Sale" to get started!</p>
-        </section>
-    </main>
+            <!-- Admin Panel -->
+            <section id="adminPanel" style="display:none;">
+                <div class="admin-nav">
+                    <button class="btn btn-primary" onclick="showAdminTab('register')">+ Register User</button>
+                    <button class="btn btn-edit" onclick="showAdminTab('users')">Manage Users</button>
+                </div>
+
+                <!-- Register User -->
+                <div id="adminRegister" class="admin-section active">
+                    <h3>Register New User</h3>
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="regName">Full Name</label>
+                            <input type="text" id="regName" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regEmail">Email</label>
+                            <input type="email" id="regEmail" placeholder="user@gmail.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regPassword">Password</label>
+                            <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="regRole">Role</label>
+                            <select id="regRole" required>
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register User</button>
+                        <p id="registerMsg" class="login-error" style="color:#11998e;"></p>
+                    </form>
+                </div>
+
+                <!-- Manage Users -->
+                <div id="adminUsers" class="admin-section">
+                    <h3>Registered Users</h3>
+                    <ul id="userList" class="user-list"></ul>
+                </div>
+            </section>
+
+            <!-- Controls -->
+            <section class="controls">
+                <button id="installBtn" class="btn btn-install" style="display:none;">📲 Install App</button>
+                <button id="addSaleBtn" class="btn btn-primary">+ Add Sale</button>
+                <input type="text" id="searchInput" placeholder="Search by customer or product...">
+                <select id="statusFilter">
+                    <option value="all">All Status</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </section>
+
+            <!-- Sales Table -->
+            <section class="table-container">
+                <table id="salesTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Product/Service</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesBody"></tbody>
+                </table>
+                <p id="noSales" class="no-data">No sales recorded yet. Click "Add Sale" to get started!</p>
+            </section>
+        </main>
+    </div>
 
     <!-- Modal -->
     <div id="modal" class="modal">
@@ -120,6 +188,18 @@
                 <button type="submit" class="btn btn-primary">Save</button>
             </form>
         </div>
+    </div>
+
+    <!-- Mobile Floating Install Bar -->
+    <div id="mobileInstallBar" class="mobile-install-bar">
+        <button id="mobileInstallBtn" class="mobile-install-btn">
+            <span class="mobile-install-icon">📲</span>
+            <span class="mobile-install-text">
+                <strong>Install Sales Tracker</strong>
+                <small>Add to Home Screen</small>
+            </span>
+        </button>
+        <button id="mobileInstallClose" class="mobile-install-close">&times;</button>
     </div>
 
     <script src="app.js"></script>

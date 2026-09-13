@@ -1,47 +1,42 @@
-let deferredPrompt;
-let sales = JSON.parse(localStorage.getItem('sales')) || [];
+// ===== ADMIN DEFAULT ACCOUNT =====
+const ADMIN_EMAIL = 'admin@gmail.com';
+const ADMIN_PASSWORD = 'admin123';
 
+// ===== INIT DATA =====
+let users = JSON.parse(localStorage.getItem('users')) || [];
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+let sales = JSON.parse(localStorage.getItem('sales')) || [];
+let deferredPrompt = null;
+
+// Seed admin if no users exist
+if (users.length === 0) {
+    users.push({
+        id: '1',
+        name: 'Admin',
+        email: ADMIN_EMAIL,
+        password: ADMIN_PASSWORD,
+        role: 'admin'
+    });
+    localStorage.setItem('users', JSON.stringify(users));
+}
+
+// ===== DOM ELEMENTS =====
+const loginOverlay = document.getElementById('loginOverlay');
+const loginForm = document.getElementById('loginForm');
+const loginError = document.getElementById('loginError');
+const appContent = document.getElementById('appContent');
+const loggedUser = document.getElementById('loggedUser');
+const logoutBtn = document.getElementById('logoutBtn');
+const adminPanel = document.getElementById('adminPanel');
+const registerForm = document.getElementById('registerForm');
+const registerMsg = document.getElementById('registerMsg');
+const userList = document.getElementById('userList');
 const modal = document.getElementById('modal');
 const installBtn = document.getElementById('installBtn');
 const heroInstallBtn = document.getElementById('heroInstallBtn');
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = 'inline-block';
-    heroInstallBtn.classList.add('available');
-});
-
-async function handleInstall() {
-    if (!deferredPrompt) {
-        window.open('https://app-to-track-sales.vercel.app', '_blank');
-        return;
-    }
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-        installBtn.style.display = 'none';
-        heroInstallBtn.textContent = '✅ Installed!';
-        heroInstallBtn.classList.add('installed');
-    }
-    deferredPrompt = null;
-}
-
-installBtn.addEventListener('click', handleInstall);
-heroInstallBtn.addEventListener('click', handleInstall);
-
-window.addEventListener('appinstalled', () => {
-    installBtn.style.display = 'none';
-    heroInstallBtn.textContent = '✅ Installed!';
-    heroInstallBtn.classList.add('installed');
-    deferredPrompt = null;
-});
-
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('Service Worker registered'))
-        .catch(err => console.log('SW registration failed:', err));
-}
+const mobileInstallBar = document.getElementById('mobileInstallBar');
+const mobileInstallBtn = document.getElementById('mobileInstallBtn');
+const mobileInstallClose = document.getElementById('mobileInstallClose');
 const addSaleBtn = document.getElementById('addSaleBtn');
 const closeBtn = document.querySelector('.close');
 const saleForm = document.getElementById('saleForm');
@@ -50,6 +45,165 @@ const searchInput = document.getElementById('searchInput');
 const statusFilter = document.getElementById('statusFilter');
 const noSales = document.getElementById('noSales');
 
+// ===== LOGIN =====
+function checkLogin() {
+    if (currentUser) {
+        loginOverlay.classList.remove('show');
+        appContent.style.display = 'block';
+        loggedUser.textContent = `${currentUser.name} (${currentUser.role})`;
+        if (currentUser.role === 'admin') {
+            adminPanel.style.display = 'block';
+            renderUserList();
+        } else {
+            adminPanel.style.display = 'none';
+        }
+        renderSales();
+        showMobileInstall();
+    } else {
+        loginOverlay.classList.add('show');
+        appContent.style.display = 'none';
+    }
+}
+
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const password = document.getElementById('loginPassword').value;
+
+    const user = users.find(u => u.email.toLowerCase() === email && u.password === password);
+    if (user) {
+        currentUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        loginError.style.display = 'none';
+        checkLogin();
+    } else {
+        loginError.style.display = 'block';
+        loginError.textContent = 'Invalid email or password';
+    }
+});
+
+logoutBtn.addEventListener('click', () => {
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    checkLogin();
+});
+
+// ===== ADMIN: REGISTER USER =====
+registerForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim().toLowerCase();
+    const password = document.getElementById('regPassword').value;
+    const role = document.getElementById('regRole').value;
+
+    if (users.find(u => u.email.toLowerCase() === email)) {
+        registerMsg.style.color = '#e74c3c';
+        registerMsg.textContent = 'Email already registered';
+        return;
+    }
+
+    const newUser = {
+        id: Date.now().toString(),
+        name,
+        email,
+        password,
+        role
+    };
+
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+    registerMsg.style.color = '#11998e';
+    registerMsg.textContent = `User "${name}" registered successfully!`;
+    registerForm.reset();
+    renderUserList();
+});
+
+function renderUserList() {
+    userList.innerHTML = '';
+    users.forEach(user => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <div class="user-info">
+                <span class="name">${escapeHtml(user.name)}</span>
+                <span class="email">${escapeHtml(user.email)}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span class="user-role ${user.role === 'admin' ? 'role-admin' : 'role-user'}">${user.role}</span>
+                ${user.email !== ADMIN_EMAIL ? `<button class="btn btn-danger" onclick="deleteUser('${user.id}')">Remove</button>` : ''}
+            </div>
+        `;
+        userList.appendChild(li);
+    });
+}
+
+function deleteUser(id) {
+    if (!confirm('Remove this user?')) return;
+    users = users.filter(u => u.id !== id);
+    localStorage.setItem('users', JSON.stringify(users));
+    renderUserList();
+}
+
+function showAdminTab(tab) {
+    document.getElementById('adminRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('adminUsers').classList.toggle('active', tab === 'users');
+}
+
+// ===== MOBILE INSTALL BAR =====
+function showMobileInstall() {
+    if (window.innerWidth <= 768) {
+        const dismissed = localStorage.getItem('mobileInstallDismissed');
+        if (!dismissed) {
+            mobileInstallBar.classList.add('show');
+        }
+    }
+}
+
+mobileInstallClose.addEventListener('click', () => {
+    mobileInstallBar.classList.remove('show');
+    localStorage.setItem('mobileInstallDismissed', 'true');
+});
+
+// ===== PWA INSTALL =====
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+    heroInstallBtn.classList.add('available');
+});
+
+async function handleInstall() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+        installBtn.style.display = 'none';
+        heroInstallBtn.textContent = '✅ Installed!';
+        heroInstallBtn.classList.add('installed');
+        mobileInstallBar.classList.remove('show');
+    }
+    deferredPrompt = null;
+}
+
+installBtn.addEventListener('click', handleInstall);
+heroInstallBtn.addEventListener('click', handleInstall);
+mobileInstallBtn.addEventListener('click', handleInstall);
+
+window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+    heroInstallBtn.textContent = '✅ Installed!';
+    heroInstallBtn.classList.add('installed');
+    mobileInstallBar.classList.remove('show');
+    deferredPrompt = null;
+});
+
+// ===== SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('Service Worker registered'))
+        .catch(err => console.log('SW registration failed:', err));
+}
+
+// ===== SALES CRUD =====
 addSaleBtn.addEventListener('click', () => {
     document.getElementById('modalTitle').textContent = 'Add Sale';
     saleForm.reset();
@@ -72,7 +226,8 @@ saleForm.addEventListener('submit', (e) => {
         customer: document.getElementById('customer').value,
         product: document.getElementById('product').value,
         amount: parseFloat(document.getElementById('amount').value),
-        status: document.getElementById('status').value
+        status: document.getElementById('status').value,
+        addedBy: currentUser ? currentUser.email : 'unknown'
     };
 
     if (id) {
@@ -131,7 +286,6 @@ function renderSales() {
 
 function updateDashboard() {
     const total = sales.reduce((sum, sale) => sum + sale.amount, 0);
-    const completed = sales.filter(s => s.status === 'Completed').length;
     const pending = sales.filter(s => s.status === 'Pending').length;
     const avg = sales.length > 0 ? total / sales.length : 0;
 
@@ -175,4 +329,5 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-renderSales();
+// ===== INIT =====
+checkLogin();
