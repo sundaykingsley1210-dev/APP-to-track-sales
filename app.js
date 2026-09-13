@@ -31,6 +31,8 @@ const adminPanel = document.getElementById('adminPanel');
 const registerForm = document.getElementById('registerForm');
 const registerMsg = document.getElementById('registerMsg');
 const userList = document.getElementById('userList');
+const accountForm = document.getElementById('accountForm');
+const accountMsg = document.getElementById('accountMsg');
 const modal = document.getElementById('modal');
 const installBtn = document.getElementById('installBtn');
 const heroInstallBtn = document.getElementById('heroInstallBtn');
@@ -53,6 +55,7 @@ function checkLogin() {
         loggedUser.textContent = `${currentUser.name} (${currentUser.role})`;
         if (currentUser.role === 'admin') {
             adminPanel.style.display = 'block';
+            document.getElementById('currentEmail').value = currentUser.email;
             renderUserList();
         } else {
             adminPanel.style.display = 'none';
@@ -146,7 +149,67 @@ function deleteUser(id) {
 function showAdminTab(tab) {
     document.getElementById('adminRegister').classList.toggle('active', tab === 'register');
     document.getElementById('adminUsers').classList.toggle('active', tab === 'users');
+    document.getElementById('adminAccount').classList.toggle('active', tab === 'account');
+    if (tab === 'account') {
+        document.getElementById('currentEmail').value = currentUser.email;
+        accountMsg.textContent = '';
+    }
 }
+
+// ===== ADMIN: CHANGE EMAIL & PASSWORD =====
+accountForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const newEmail = document.getElementById('newEmail').value.trim().toLowerCase();
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    accountMsg.textContent = '';
+
+    if (currentUser.password !== currentPassword) {
+        accountMsg.style.color = '#e74c3c';
+        accountMsg.textContent = 'Current password is incorrect';
+        return;
+    }
+
+    if (newPassword && newPassword !== confirmPassword) {
+        accountMsg.style.color = '#e74c3c';
+        accountMsg.textContent = 'New passwords do not match';
+        return;
+    }
+
+    if (newPassword && newPassword.length < 6) {
+        accountMsg.style.color = '#e74c3c';
+        accountMsg.textContent = 'Password must be at least 6 characters';
+        return;
+    }
+
+    if (newEmail !== currentUser.email && users.find(u => u.email.toLowerCase() === newEmail && u.id !== currentUser.id)) {
+        accountMsg.style.color = '#e74c3c';
+        accountMsg.textContent = 'Email is already taken by another user';
+        return;
+    }
+
+    const userIndex = users.findIndex(u => u.id === currentUser.id);
+    users[userIndex].email = newEmail;
+    if (newPassword) {
+        users[userIndex].password = newPassword;
+    }
+
+    localStorage.setItem('users', JSON.stringify(users));
+    currentUser = users[userIndex];
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+    document.getElementById('currentEmail').value = newEmail;
+    document.getElementById('newEmail').value = '';
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+    loggedUser.textContent = `${currentUser.name} (${currentUser.role})`;
+
+    accountMsg.style.color = '#11998e';
+    accountMsg.textContent = 'Account updated successfully!';
+});
 
 // ===== MOBILE INSTALL BAR =====
 function showMobileInstall() {
