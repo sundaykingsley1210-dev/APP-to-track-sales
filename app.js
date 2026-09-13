@@ -7,6 +7,7 @@ let users = JSON.parse(localStorage.getItem('users')) || [];
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 let sales = JSON.parse(localStorage.getItem('sales')) || [];
 let deferredPrompt = null;
+let regPicData = null;
 
 // Seed admin if no users exist
 if (users.length === 0) {
@@ -15,7 +16,13 @@ if (users.length === 0) {
         name: 'Admin',
         email: ADMIN_EMAIL,
         password: ADMIN_PASSWORD,
-        role: 'admin'
+        role: 'admin',
+        phone: '',
+        address: '',
+        gender: '',
+        age: '',
+        education: '',
+        pic: ''
     });
     localStorage.setItem('users', JSON.stringify(users));
 }
@@ -46,6 +53,37 @@ const salesBody = document.getElementById('salesBody');
 const searchInput = document.getElementById('searchInput');
 const statusFilter = document.getElementById('statusFilter');
 const noSales = document.getElementById('noSales');
+const hamburger = document.getElementById('hamburger');
+const mainNav = document.getElementById('mainNav');
+const regPicInput = document.getElementById('regPic');
+const regPicPreview = document.getElementById('regPicPreview');
+
+// ===== HAMBURGER MENU =====
+hamburger.addEventListener('click', () => {
+    mainNav.classList.toggle('open');
+});
+
+// ===== NAV SCROLL =====
+function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    mainNav.classList.remove('open');
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    event.target.classList.add('active');
+}
+window.scrollToSection = scrollToSection;
+
+// ===== PROFILE PICTURE PREVIEW =====
+regPicInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        regPicData = ev.target.result;
+        regPicPreview.innerHTML = `<img src="${regPicData}" alt="Profile">`;
+    };
+    reader.readAsDataURL(file);
+});
 
 // ===== LOGIN =====
 function checkLogin() {
@@ -98,6 +136,11 @@ registerForm.addEventListener('submit', (e) => {
     const email = document.getElementById('regEmail').value.trim().toLowerCase();
     const password = document.getElementById('regPassword').value;
     const role = document.getElementById('regRole').value;
+    const phone = document.getElementById('regPhone').value.trim();
+    const gender = document.getElementById('regGender').value;
+    const age = document.getElementById('regAge').value;
+    const education = document.getElementById('regEducation').value;
+    const address = document.getElementById('regAddress').value.trim();
 
     if (users.find(u => u.email.toLowerCase() === email)) {
         registerMsg.style.color = '#e74c3c';
@@ -110,7 +153,13 @@ registerForm.addEventListener('submit', (e) => {
         name,
         email,
         password,
-        role
+        role,
+        phone,
+        gender,
+        age,
+        education,
+        address,
+        pic: regPicData || ''
     };
 
     users.push(newUser);
@@ -118,17 +167,31 @@ registerForm.addEventListener('submit', (e) => {
     registerMsg.style.color = '#11998e';
     registerMsg.textContent = `User "${name}" registered successfully!`;
     registerForm.reset();
+    regPicData = null;
+    regPicPreview.innerHTML = '<span>📷</span>';
     renderUserList();
 });
 
 function renderUserList() {
     userList.innerHTML = '';
     users.forEach(user => {
+        const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
         const li = document.createElement('li');
         li.innerHTML = `
-            <div class="user-info">
-                <span class="name">${escapeHtml(user.name)}</span>
-                <span class="email">${escapeHtml(user.email)}</span>
+            <div class="user-details">
+                <div class="user-avatar">
+                    ${user.pic ? `<img src="${user.pic}" alt="${user.name}">` : initials}
+                </div>
+                <div class="user-info">
+                    <span class="name">${escapeHtml(user.name)}</span>
+                    <span class="email">${escapeHtml(user.email)}</span>
+                    <div class="user-meta">
+                        <span>${user.phone || '—'}</span>
+                        <span>${user.gender || '—'}</span>
+                        <span>${user.age ? user.age + ' yrs' : '—'}</span>
+                        <span>${user.education || '—'}</span>
+                    </div>
+                </div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;">
                 <span class="user-role ${user.role === 'admin' ? 'role-admin' : 'role-user'}">${user.role}</span>

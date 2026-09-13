@@ -32,7 +32,6 @@
                 <button type="submit" class="btn btn-primary">Sign In</button>
                 <p id="loginError" class="login-error">Invalid email or password</p>
             </form>
-            <p class="login-footer">Admin: admin@gmail.com / admin123</p>
         </div>
     </div>
 
@@ -41,16 +40,23 @@
         <header>
             <div class="container header-right">
                 <h1>Sales Tracker</h1>
+                <nav class="main-nav" id="mainNav">
+                    <a href="#" class="nav-link active" onclick="scrollToSection('hero')">Home</a>
+                    <a href="#" class="nav-link" onclick="scrollToSection('aboutSection')">About</a>
+                    <a href="#" class="nav-link" onclick="scrollToSection('servicesSection')">Services</a>
+                    <a href="#" class="nav-link" onclick="scrollToSection('contactSection')">Contact Us</a>
+                </nav>
                 <div class="user-badge">
                     <span id="loggedUser"></span>
                     <button id="logoutBtn" class="btn-logout">Logout</button>
                 </div>
+                <button class="hamburger" id="hamburger">&#9776;</button>
             </div>
         </header>
 
         <main class="container">
             <!-- Hero / Install Banner -->
-            <section class="hero">
+            <section class="hero" id="hero">
                 <div class="hero-content">
                     <h2>Track Your Sales Easily</h2>
                     <p>Install this app on your phone or computer for quick access anytime, even offline.</p>
@@ -91,24 +97,72 @@
                 <div id="adminRegister" class="admin-section active">
                     <h3>Register New User</h3>
                     <form id="registerForm">
-                        <div class="form-group">
-                            <label for="regName">Full Name</label>
-                            <input type="text" id="regName" placeholder="John Doe" required>
+                        <div class="profile-pic-section">
+                            <div class="profile-pic-preview" id="regPicPreview">
+                                <span>📷</span>
+                            </div>
+                            <label for="regPic" class="btn btn-edit" style="cursor:pointer;">Choose Photo</label>
+                            <input type="file" id="regPic" accept="image/*" style="display:none;">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="regName">Full Name</label>
+                                <input type="text" id="regName" placeholder="John Doe" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="regEmail">Email</label>
+                                <input type="email" id="regEmail" placeholder="user@gmail.com" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="regPhone">Phone Number</label>
+                                <input type="tel" id="regPhone" placeholder="08012345678" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="regGender">Gender</label>
+                                <select id="regGender" required>
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="regAge">Age</label>
+                                <input type="number" id="regAge" min="1" max="120" placeholder="25" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="regEducation">Education</label>
+                                <select id="regEducation" required>
+                                    <option value="">Select</option>
+                                    <option value="High School">High School</option>
+                                    <option value="Diploma">Diploma</option>
+                                    <option value="Bachelor's Degree">Bachelor's Degree</option>
+                                    <option value="Master's Degree">Master's Degree</option>
+                                    <option value="PhD">PhD</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label for="regEmail">Email</label>
-                            <input type="email" id="regEmail" placeholder="user@gmail.com" required>
+                            <label for="regAddress">Address</label>
+                            <input type="text" id="regAddress" placeholder="123 Main St, Lagos" required>
                         </div>
-                        <div class="form-group">
-                            <label for="regPassword">Password</label>
-                            <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6">
-                        </div>
-                        <div class="form-group">
-                            <label for="regRole">Role</label>
-                            <select id="regRole" required>
-                                <option value="user">User</option>
-                                <option value="admin">Admin</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="regPassword">Password</label>
+                                <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6">
+                            </div>
+                            <div class="form-group">
+                                <label for="regRole">Role</label>
+                                <select id="regRole" required>
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Register User</button>
                         <p id="registerMsg" class="login-error" style="color:#11998e;"></p>
@@ -180,6 +234,61 @@
                     <tbody id="salesBody"></tbody>
                 </table>
                 <p id="noSales" class="no-data">No sales recorded yet. Click "Add Sale" to get started!</p>
+            </section>
+
+            <!-- About Section -->
+            <section id="aboutSection" class="info-section">
+                <h2>About Us</h2>
+                <p>Sales Tracker is a powerful yet simple tool designed to help you manage and track your sales efficiently. Built with modern web technology, it works offline and can be installed on any device. Our mission is to make sales tracking accessible to everyone, from small business owners to large enterprises.</p>
+            </section>
+
+            <!-- Services Section -->
+            <section id="servicesSection" class="info-section">
+                <h2>Our Services</h2>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-icon">📊</div>
+                        <h3>Sales Tracking</h3>
+                        <p>Record and monitor all your sales in one place with detailed analytics.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">👥</div>
+                        <h3>User Management</h3>
+                        <p>Admin can register and manage team members with different roles.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">📱</div>
+                        <h3>Offline Access</h3>
+                        <p>Install the app and use it even without internet connection.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">🔒</div>
+                        <h3>Secure Login</h3>
+                        <p>Your data is protected with secure authentication system.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section id="contactSection" class="info-section">
+                <h2>Contact Us</h2>
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <div class="contact-icon">📧</div>
+                        <h3>Email</h3>
+                        <p>support@salestracker.com</p>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-icon">📞</div>
+                        <h3>Phone</h3>
+                        <p>+234 800 123 4567</p>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-icon">📍</div>
+                        <h3>Address</h3>
+                        <p>123 Business Ave, Lagos, Nigeria</p>
+                    </div>
+                </div>
             </section>
         </main>
     </div>
