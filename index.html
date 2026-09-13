@@ -47,6 +47,7 @@
                     <a href="#" class="nav-link" onclick="scrollToSection('contactSection')">Contact Us</a>
                 </nav>
                 <div class="user-badge">
+                    <div class="header-avatar" id="headerAvatar"></div>
                     <span id="loggedUser"></span>
                     <button id="logoutBtn" class="btn-logout">Logout</button>
                 </div>
@@ -226,6 +227,7 @@
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Product/Service</th>
+                            <th>Qty</th>
                             <th>Amount</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -300,31 +302,43 @@
             <h2 id="modalTitle">Add Sale</h2>
             <form id="saleForm">
                 <input type="hidden" id="saleId">
-                <div class="form-group">
-                    <label for="saleDate">Date</label>
-                    <input type="date" id="saleDate" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="saleDate">📅 Date</label>
+                        <input type="date" id="saleDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">📋 Status</label>
+                        <select id="status" required>
+                            <option value="Completed">✅ Completed</option>
+                            <option value="Pending">⏳ Pending</option>
+                            <option value="Cancelled">❌ Cancelled</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="customer">Customer</label>
-                    <input type="text" id="customer" placeholder="Customer name" required>
+                    <label for="customer">👤 Customer Name</label>
+                    <input type="text" id="customer" placeholder="e.g. John Doe" required>
                 </div>
                 <div class="form-group">
-                    <label for="product">Product/Service</label>
-                    <input type="text" id="product" placeholder="Product or service name" required>
+                    <label for="product">📦 Product / Service</label>
+                    <input type="text" id="product" placeholder="e.g. iPhone 15 Pro" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="amount">💰 Amount (₦)</label>
+                        <input type="number" id="amount" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">🔢 Quantity</label>
+                        <input type="number" id="quantity" min="1" value="1" placeholder="1">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="amount">Amount (₦)</label>
-                    <input type="number" id="amount" step="0.01" min="0" placeholder="0.00" required>
+                    <label for="saleNote">📝 Note (optional)</label>
+                    <input type="text" id="saleNote" placeholder="Any additional info...">
                 </div>
-                <div class="form-group">
-                    <label for="status">Status</label>
-                    <select id="status" required>
-                        <option value="Completed">Completed</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary">💾 Save Sale</button>
             </form>
         </div>
     </div>

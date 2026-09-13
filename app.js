@@ -33,6 +33,7 @@ const loginForm = document.getElementById('loginForm');
 const loginError = document.getElementById('loginError');
 const appContent = document.getElementById('appContent');
 const loggedUser = document.getElementById('loggedUser');
+const headerAvatar = document.getElementById('headerAvatar');
 const logoutBtn = document.getElementById('logoutBtn');
 const adminPanel = document.getElementById('adminPanel');
 const registerForm = document.getElementById('registerForm');
@@ -91,6 +92,15 @@ function checkLogin() {
         loginOverlay.classList.remove('show');
         appContent.style.display = 'block';
         loggedUser.textContent = `${currentUser.name} (${currentUser.role})`;
+        
+        // Show profile picture in header
+        if (currentUser.pic) {
+            headerAvatar.innerHTML = `<img src="${currentUser.pic}" alt="${currentUser.name}">`;
+        } else {
+            const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            headerAvatar.innerHTML = initials;
+        }
+        
         if (currentUser.role === 'admin') {
             adminPanel.style.display = 'block';
             document.getElementById('currentEmail').value = currentUser.email;
@@ -353,6 +363,8 @@ saleForm.addEventListener('submit', (e) => {
         product: document.getElementById('product').value,
         amount: parseFloat(document.getElementById('amount').value),
         status: document.getElementById('status').value,
+        quantity: parseInt(document.getElementById('quantity').value) || 1,
+        note: document.getElementById('saleNote').value.trim(),
         addedBy: currentUser ? currentUser.email : 'unknown'
     };
 
@@ -392,10 +404,13 @@ function renderSales() {
         noSales.style.display = 'none';
         filtered.forEach(sale => {
             const tr = document.createElement('tr');
+            const noteHtml = sale.note ? `<br><small style="color:#999;">📝 ${escapeHtml(sale.note)}</small>` : '';
+            const qty = sale.quantity || 1;
             tr.innerHTML = `
                 <td>${formatDate(sale.date)}</td>
                 <td>${escapeHtml(sale.customer)}</td>
-                <td>${escapeHtml(sale.product)}</td>
+                <td>${escapeHtml(sale.product)}${noteHtml}</td>
+                <td>${qty}</td>
                 <td>₦${sale.amount.toFixed(2)}</td>
                 <td><span class="status status-${sale.status.toLowerCase()}">${sale.status}</span></td>
                 <td class="actions">
@@ -429,6 +444,8 @@ function editSale(id) {
     document.getElementById('customer').value = sale.customer;
     document.getElementById('product').value = sale.product;
     document.getElementById('amount').value = sale.amount;
+    document.getElementById('quantity').value = sale.quantity || 1;
+    document.getElementById('saleNote').value = sale.note || '';
     document.getElementById('status').value = sale.status;
     modal.style.display = 'block';
 }
